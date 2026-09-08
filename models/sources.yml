@@ -6,12 +6,20 @@ sources:
     schema: public
     tables:
       - name: actor
-        description: 'info about actor'
+        description: info about actor
         columns:
           - name: actor_id
-            description: 'actor id primary key for this table'
+            description: actor id primary key for this table
       - name: address
+        description: complete address
+        columns:
+          - name: address_id
+            description: address id primary key for this table
       - name: category
+        description: talks about various film categories 
+        columns:
+          - name: category_id
+            description: category id primary key for this table
       - name: city
       - name: country
       - name: customer
@@ -21,6 +29,25 @@ sources:
       - name: inventory
       - name: language
       - name: payment
+        config: 
+          freshness:
+            warn_after:
+              count: 6
+              period: hour
+            error_after:
+              count: 12
+              period: hour 
+          loaded_at_field: payment_date
       - name: rental
+        config: 
+          freshness: 
+            warn_after: 
+              count: 4
+              period: hour 
+            error_after: 
+              count: 4
+              period: hour
+          loaded_at_field: rental_date
+            
       - name: staff
       - name: store
