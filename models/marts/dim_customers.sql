@@ -6,7 +6,7 @@
         materialized = 'view'
     )
 }}
-select cu.first_name,cu.last_name, cu.email, ad.address,ci.city,co.country
+select cu.customer_id,cu.first_name,cu.last_name, cu.email, ad.address,ci.city,co.country
 from {{ 
     ref (
         'stg_pagila__customers'

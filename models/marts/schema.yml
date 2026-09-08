@@ -1,0 +1,84 @@
+version: 2
+
+models: 
+  - name: dim_customers
+    description: Customer dimension containing customer details and address information
+    columns:
+      - name: customer_id
+      - name: first_name 
+        description: "Customer first name." 
+      - name: last_name 
+        description: "Customer last name." 
+      - name: email 
+        description: "Customer email address." 
+      - name: address
+        description: "Secondary customer address." 
+      - name: city 
+        description: "Customer city." 
+      - name: country 
+        description: "Customer country."
+  - name: dim_films 
+    description: "Film dimension containing film details, language, categories, and actors."
+    columns:
+      - name: film_id 
+        description: "Unique identifier for the film." 
+        tests: 
+          - unique 
+          - not_null
+      - name: title 
+        description: "Film title." 
+        tests: 
+          - not_null 
+      - name: language 
+        description: "Language of the film." 
+      - name: categories 
+        description: "Comma-separated list of categories associated with the film." 
+      - name: actors 
+        description: "Comma-separated list of actors appearing in the film."
+  - name: fct_rentals 
+    description: "Fact table containing film rental transactions." 
+    columns: 
+        - name: rental_id
+        - name: customer_key 
+          description: "Customer associated with the rental." 
+          tests: 
+          - not_null 
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field : customer_id
+        - name: film_key 
+          description: "Film associated with the rental." 
+          tests: 
+            - not_null 
+            - relationships:
+                arguments:
+                  to: ref('dim_films')
+                  field: film_id
+        - name: store_key 
+          description: "Store associated with the rental." 
+        - name: rental_date 
+          description: "Date and time when the film was rented." 
+        - name: return_date 
+          description: "Date and time when the film was returned." 
+        - name: rental_duration_days 
+          description: "Number of days between rental and return."
+  - name: fct_payments 
+    description: "Fact table containing customer payment transactions." 
+    columns: 
+      - name: payment_amount 
+        description: "Amount paid by the customer." 
+        tests: 
+          - not_null 
+      - name: full_name 
+        description: "Full name of the customer." 
+      - name: payment_date 
+        description: "Date and time when the payment was made." 
+      - name: rental_date 
+        description: "Date and time when the associated rental started." 
+      - name: return_date 
+        description: "Date and time when the associated rental was returned." 
+      - name: payment_punctuality 
+        description: "Derived classification of payment timing." 
+      - name: rental_punctuality 
+        description: "Derived classification of whether the rental was returned within five days."

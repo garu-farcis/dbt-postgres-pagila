@@ -8,6 +8,7 @@
     )
 }}
 select re.customer_id as customer_key,
+re.rental_id,
 inv.film_id as film_key,
 inv.store_id as store_key,
 re.rental_date, re.return_date, 
