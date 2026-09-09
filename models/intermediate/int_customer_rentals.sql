@@ -2,7 +2,7 @@
 --aggregates per customer: total rentals, total payments, average rental duration, first/last rental date.
 {{
     config(
-        materialized = 'view'
+        materialized = 'table'
     )
 }}
 

@@ -1,0 +1,16 @@
+selectors:
+  - name: business_logic_only
+    description: "Intermediate + Marts only"
+    definition:
+      union:
+        - method: path
+          value: models/intermediate
+        - method: path
+          value: models/marts
+  - name: staging_models_only 
+    description: "running staging models only"
+    definition:
+      union:
+        - method: path
+          value: models/staging
+          children: true
