@@ -26,6 +26,7 @@ customer_payments as (
 )
 
 select
+    cu.customer_id,
     concat(cu.first_name, ' ', cu.last_name) as full_name,
     coalesce(cr.total_rentals, 0) as total_rentals,
     coalesce(cp.total_payments, 0) as total_payments,
