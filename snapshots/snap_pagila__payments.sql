@@ -7,6 +7,7 @@
         strategy = 'timestamp',
         updated_at = 'payment_date',
         invalidate_hard_deletes = true
+
     )
 }}
 
