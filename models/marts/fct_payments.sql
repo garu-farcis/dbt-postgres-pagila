@@ -1,13 +1,20 @@
 --Create fct_payments.sql that joins payments to rentals / customers and 
 --calculates payment amount, payment date, and any derived flags (e.g. late payment if you can define it)
+--Convert fct_payments into an incremental model.
+--     Use unique_key = 'payment_id' and a watermark on payment_date.
+--     Add on_schema_change = 'sync_all_columns'. Explain why you chose the strategy.
 
 {{
     config(
-        materialized= 'view'
+        materialized= 'incremental',
+        unique_key='payment_id',
+        incremental_strategy='merge',
+        updated_at='payment_date',
+        on_schema_change='sync_all_columns'
     )
 }}
 
-select pay.amount as payment_amount,
+select pay.payment_id,pay.amount as payment_amount,
 concat(cu.first_name,' ',cu.last_name) as full_name,
 pay.payment_date,
 (case 
@@ -24,4 +31,12 @@ from {{ref('stg_pagila__payments')}} as pay left join {{ref('stg_pagila__custome
 on pay.customer_id=cu.customer_id
 left join {{ref('stg_pagila__rental')}} as re
 on re.rental_id=pay.rental_id
-group by cu.customer_id,pay.amount,pay.payment_date,re.return_date,re.rental_date,cu.first_name,cu.last_name
+
+
+{% if is_incremental() %}
+    where pay.payment_date > (
+        select max(payment_date)
+        from {{ this }}
+    )
+{% endif %}
+
