@@ -69,6 +69,9 @@ models:
       - name: payment_amount 
         description: "Amount paid by the customer." 
         tests: 
+          - expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100
           - not_null 
       - name: full_name 
         description: "Full name of the customer." 
