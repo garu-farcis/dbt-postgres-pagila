@@ -7,30 +7,29 @@
         materialized='table'
     )
 }}
-with currently_available as (
-    select ff.film_id as current_available
-    from film ff left join inventory inv
-    on inv.film_id=ff.film_id
-    left join rental re
-    on re.inventory_id=inv.inventory_id
-    left join store st
-    on st.store_id=inv.store_id
-    group by ff.film_id,st.store_id
-    having max(re.rental_date)< curdate() and max(re.return_date) < CURDATE()
-
-currently_rented as(
-    select ff.film_id as current_rented,count(inv.inventory_id) as copies
-    from film ff left join inventory inv
-    on inv.film_id=ff.film_id
-    left join rental re
-    on re.inventory_id=inv.inventory_id
-    left join store st
-    on st.store_id=inv.store_id
-    group by ff.film_id,st.store_id
-    having max(re.rental_date) not in null and max(re.return_date) <= CURDATE()
-
+with latest_rental as (
+    select inventory_id,
+    return_date,
+    row_number() over (
+        partition by inventory_id
+        order by rental_date desc
+    )as rn
+    from rental
 
 )
-select cr.copies,cr.current_rented,ca.current_available
-from currently_rented cr left join currently_available  ca
-on cr.film_id =ca.film_id
+SELECT
+    f.title,
+    COUNT(CASE
+        WHEN lr.return_date IS NULL THEN 1
+    END) AS copies_rented,
+
+    COUNT(CASE
+        WHEN lr.return_date IS NOT NULL OR lr.inventory_id IS NULL THEN 1
+    END) AS copies_available
+FROM film f
+JOIN inventory i
+    ON f.film_id = i.film_id
+LEFT JOIN latest_rental lr
+    ON i.inventory_id = lr.inventory_id
+    and lr.rn=1
+GROUP BY f.film_id, f.title

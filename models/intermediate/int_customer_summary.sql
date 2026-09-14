@@ -7,7 +7,8 @@
     )
 }}
 with dim_cust as (
-    select dc.customer_id,dc.first_name,dc.last_name,dc.email,dc.address,dc.city,dc.country from {{ref('dim_customers')}} as dc group by dc.customer_id,dc.first_name,dc.last_name,dc.email,dc.address,dc.city,dc.country
+    select dc.customer_id,dc.first_name,dc.last_name,dc.email,dc.address,dc.city,dc.country 
+    from {{ref('dim_customers')}} as dc group by dc.customer_id,dc.first_name,dc.last_name,dc.email,dc.address,dc.city,dc.country
 ), 
 cust_rent as(
     select cr.customer_id,cr.total_rentals,cr.average_rental_duration,
