@@ -16,9 +16,9 @@ with late_rental as (
         else 0
         end
     ) as late_by_days
-    from film ff left join inventory inv
+    from {{ref('stg_pagila__films')}} ff left join {{ref('stg_pagila__inventory')}} inv
     on inv.film_id=ff.film_id
-    left join rental re
+    left join {{ref('stg_pagila__rental')}} re
     on re.inventory_id=inv.inventory_id
 )
 
