@@ -2,8 +2,8 @@
     with date_spine as (
        select(
          generate_series(
-            '{{start_date}}'::date,
-            '{{end_date}}'::date,
+            {{start_date}}::date,
+            {{end_date}}::date,
             '1 day'::interval
         )
     )::date as date_day

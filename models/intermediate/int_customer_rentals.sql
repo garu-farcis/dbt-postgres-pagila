@@ -9,12 +9,13 @@
 with customer_rentals as (
     select
         customer_id,
+        rental_date as rental_date,
         count(rental_id) as total_rentals,
         round(avg(return_date::date - rental_date::date),2) as average_rental_duration,
         min(rental_date) as first_rental_date,
         max(rental_date) as last_rental_date
     from {{ ref('stg_pagila__rental') }}
-    group by customer_id
+    group by customer_id,rental_date
 ),
 
 customer_payments as (
@@ -27,6 +28,7 @@ customer_payments as (
 
 select
     cu.customer_id,
+    cr.rental_date,
     concat(cu.first_name, ' ', cu.last_name) as full_name,
     coalesce(cr.total_rentals, 0) as total_rentals,
     coalesce(cp.total_payments, 0) as total_payments,
