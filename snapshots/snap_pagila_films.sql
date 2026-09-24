@@ -1,6 +1,6 @@
 -- 32. Build a second snapshot `snap_films` that tracks changes to rental_rate, length, and rating.
 --     Use the check strategy with a list of columns.
-{% snapshot snap_films %}
+{% snapshot snap_pagila_films %}
 {{
     config(
         target_schema='snapshots',
