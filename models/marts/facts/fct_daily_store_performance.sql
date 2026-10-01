@@ -10,10 +10,8 @@
 {{
     config(
         materialized='incremental',
-        unique_key='store_key',
-        strategy='check',
-        check_cols=['last_update'],
-        invalidate_hard_truths=True
+        unique_key=['store_key', 'performance_date'],
+        incremental_strategy='delete+insert'
 
     )
 }}
