@@ -10,7 +10,6 @@
 
 with ranking_cat_by_revenue as (
     select pay.customer_id as cust_key,
-    fc.film_id as film_key,
     count(re.rental_id) as rental_count,
     coalesce(sum(pay.amount),0) as revenue,
     fc.category_id as category_key,
@@ -26,7 +25,6 @@ with ranking_cat_by_revenue as (
     ),
     ranking_by_count as (
         select rr.cust_key as cust_key,
-        rr.film_key as film_key,
         rr.category_rank_rev category_rank_rev,
         rr.revenue as revenue,
         rr.rental_count as rental_count,
@@ -49,21 +47,9 @@ top_revenue as (
     where category_rank_rev <= 3
 
 ),
-count_array as (
-
-    select
-        cust_key,
-        array_agg(
-            (category_key, category_rank_final, rental_count)
-            order by category_rank_final
-        ) as ranking_by_count
-    from top_count
-    group by cust_key
-
-),
 
 revenue_array as (
-select cust_key,array_agg((category_key, category_rank_rev, revenue)
+select cust_key,array_agg((category_key)
 order by category_rank_rev) as ranking_by_revenue
 from top_revenue
 group by cust_key
@@ -71,7 +57,7 @@ group by cust_key
 ),
 count_array as (
 select cust_key,
-array_agg((category_key, category_rank_final, rental_count)
+array_agg((category_key)
 order by category_rank_final) as ranking_by_count
 from top_count
 group by cust_key

@@ -10,19 +10,19 @@
 with popular_films as (
     select ff.film_id as film_keys,
     re.customer_id as cust_keys,
-rr.rental_count as rental_count,
-rr.category_rank_final as top_categories,
+count(re.rental_id) as rental_count,
+rr.ranking_by_count as top_categories,
 row_number() over(
-    partition by re.customer_id order by rr.rental_count desc
+    partition by re.customer_id order by count(re.rental_id) desc
 ) as most_popular
 from {{ref('stg_pagila__films')}} as ff left join {{source('pagila','inventory')}} as inv
 on ff.film_id=inv.film_id
-left join ren{ source('pagila','rental') }}tal re
+left join {{source('pagila','rental') }} re
 on inv.inventory_id=re.inventory_id
-left join {{ ref('film_affinity') }} rr
+left join {{ ref('int_film_affinity') }} rr
 on re.customer_id=rr.cust_key
 where re.rental_date is null 
-group by ff.film_id,re.customer_id,rr.rental_count,rr.category_rank_final
+group by ff.film_id,re.customer_id,re.rental_id,rr.ranking_by_count
 )
 select pf.film_keys,
 pf.cust_keys,
