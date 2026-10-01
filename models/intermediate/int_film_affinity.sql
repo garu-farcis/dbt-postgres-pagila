@@ -27,16 +27,69 @@ with ranking_cat_by_revenue as (
         select rr.cust_key as cust_key,
         rr.category_rank_rev category_rank_rev,
         rr.revenue as revenue,
-        rr.film_count as rental_count,
+        rr.rental_count as rental_count,
         rr.category_key as category_key,
     row_number()over (
-        partition by rr.cust_key order by rr.film_count desc ) category_rank_final
+        partition by rr.cust_key order by rr.rental_count desc ) category_rank_final
     from  ranking_cat_by_revenue rr
-    )
+    ),
+    top_count as (
+
+    select *
+    from ranking_by_count
+    where category_rank_final <= 3
+
+),
+
+top_revenue as (
+
+    select *
+    from ranking_by_count
+    where category_rank_rev <= 3
+
+),
+count_array as (
+
+    select
+        cust_key,
+        array_agg(
+            (category_key, category_rank_final, rental_count)
+            order by category_rank_final
+        ) as ranking_by_count
+    from top_count
+    group by cust_key
+
+),
+
+revenue_array as (
+
+    select
+        cust_key,
+        array_agg(
+            (category_key, category_rank_rev, revenue)
+            order by category_rank_rev
+        ) as ranking_by_revenue
+    from top_revenue
+    group by cust_key
+
+),
+count_array as (
+
+    select
+        cust_key,
+        array_agg(
+            (category_key, category_rank_final, rental_count)
+            order by category_rank_final
+        ) as ranking_by_count
+    from top_count
+    group by cust_key
+
+)
     
 select  rr.cust_key,
 array_agg((rr.category_key,rr.category_rank_final,rr.rental_count)) as ranking_by_count,
 array_agg((rrr.category_key,rrr.category_rank_rev,rrr.revenue)) as ranking_by_revenue
-from ranking_by_count rr left join ranking_cat_by_revenue rrr
-on rr.cust_key=rrr.cust_key
-group by rr.cust_key where rr.category_rank_final<=3 or rr.category_rank_rev<=3 
+from ranking_by_count rr inner join ranking_cat_by_revenue rrr
+on rr.category_key=rrr.category_key
+where rr.category_rank_final<=3 or rr.category_rank_rev<=3 
+group by rr.cust_key 
