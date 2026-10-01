@@ -34,7 +34,6 @@ with ranking_cat_by_revenue as (
     from  ranking_cat_by_revenue rr
     ),
     top_count as (
-
     select *
     from ranking_by_count
     where category_rank_final <= 3
@@ -62,34 +61,23 @@ count_array as (
 ),
 
 revenue_array as (
-
-    select
-        cust_key,
-        array_agg(
-            (category_key, category_rank_rev, revenue)
-            order by category_rank_rev
-        ) as ranking_by_revenue
-    from top_revenue
-    group by cust_key
+select cust_key,array_agg((category_key, category_rank_rev, revenue)
+order by category_rank_rev) as ranking_by_revenue
+from top_revenue
+group by cust_key
 
 ),
 count_array as (
-
-    select
-        cust_key,
-        array_agg(
-            (category_key, category_rank_final, rental_count)
-            order by category_rank_final
-        ) as ranking_by_count
-    from top_count
-    group by cust_key
+select cust_key,
+array_agg((category_key, category_rank_final, rental_count)
+order by category_rank_final) as ranking_by_count
+from top_count
+group by cust_key
 
 )
     
-select  rr.cust_key,
-array_agg((rr.category_key,rr.category_rank_final,rr.rental_count)) as ranking_by_count,
-array_agg((rrr.category_key,rrr.category_rank_rev,rrr.revenue)) as ranking_by_revenue
-from ranking_by_count rr inner join ranking_cat_by_revenue rrr
-on rr.category_key=rrr.category_key
-where rr.category_rank_final<=3 or rr.category_rank_rev<=3 
-group by rr.cust_key 
+select ca.cust_key,
+     ca.ranking_by_count,
+    ra.ranking_by_revenue
+from count_array ca left join revenue_array ra
+on ca.cust_key = ra.cust_key
