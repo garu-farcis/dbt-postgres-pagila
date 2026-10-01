@@ -10,6 +10,7 @@
 
 with ranking_cat_by_revenue as (
     select pay.customer_id as cust_key,
+    fc.film_id as film_key,
     count(re.rental_id) as rental_count,
     coalesce(sum(pay.amount),0) as revenue,
     fc.category_id as category_key,
@@ -25,6 +26,7 @@ with ranking_cat_by_revenue as (
     ),
     ranking_by_count as (
         select rr.cust_key as cust_key,
+        rr.film_key as film_key,
         rr.category_rank_rev category_rank_rev,
         rr.revenue as revenue,
         rr.rental_count as rental_count,
