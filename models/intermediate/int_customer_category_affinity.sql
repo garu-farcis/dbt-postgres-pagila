@@ -24,7 +24,7 @@ with cust_categ_ranking as (
 by_revenue as (
     select pp.amount as revenue,
     cc.cust_key,
-    cc.full_name
+    cc.full_name,
     cc.ranking,
     count(*) as counts,
     rank() over (order by pp.amount desc) as by_rev
@@ -34,8 +34,8 @@ by_revenue as (
 ),
 by_count as (
     select cc.cust_key,
-    cc.full_name
+    cc.full_name,
     rank() over (order by cc.counts desc) as by_cnt
     from by_revenue cc
 )
-select * from by_count limit 3;
+select * from by_count
